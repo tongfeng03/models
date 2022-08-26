@@ -115,6 +115,14 @@ class SegmentationLossDiceScore(object):
         return tf.convert_to_tensor(1.0)
       weighted_dice = tf.cast(weighted_dice, dtype=tf.float32)
       return 1 - tf.reduce_mean(weighted_dice / normalizer)
+    elif self._metric_type == 'smooth':
+      smooth = 1e-5
+      summation = tf.reduce_sum(
+          labels, axis=self._axis) + tf.reduce_sum(
+              logits, axis=self._axis) 
+      dice = (2 * tf.reduce_sum(labels * logits, axis=self._axis) + smooth) / (
+          summation + smooth + epsilon)
+      return 1 - tf.reduce_mean(dice)
     else:
       summation = tf.reduce_sum(
           labels, axis=self._axis) + tf.reduce_sum(
