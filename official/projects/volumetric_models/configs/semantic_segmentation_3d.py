@@ -51,6 +51,7 @@ class SegmentationHead3D(hyperparams.Config):
   """Segmentation head config."""
   num_classes: int = 0
   level: int = 1
+  network_architecture: str = '3d'
   num_convs: int = 0
   num_filters: int = 256
   upsample_factor: int = 1
@@ -115,10 +116,10 @@ def seg_unet3d_test() -> cfg.ExperimentConfig:
               input_size=[32, 32, 32],
               num_channels=2,
               backbone=backbones.Backbone(
-                  type='unet_3d', unet_3d=backbones.UNet3D(model_id=2)),
+                  type='unet_3d', unet_3d=backbones.UNet3D(task_id=1)),
               decoder=decoders.Decoder(
                   type='unet_3d_decoder',
-                  unet_3d_decoder=decoders.UNet3DDecoder(model_id=2)),
+                  unet_3d_decoder=decoders.UNet3DDecoder(task_id=1)),
               head=SegmentationHead3D(num_convs=0, num_classes=2),
               norm_activation=common.NormActivation(
                   activation='relu', use_sync_bn=False)),

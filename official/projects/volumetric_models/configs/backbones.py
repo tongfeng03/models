@@ -23,9 +23,9 @@ from official.modeling import hyperparams
 @dataclasses.dataclass
 class UNet3D(hyperparams.Config):
   """UNet3D config."""
-  model_id: int = 4
-  pool_size: Sequence[int] = (2, 2, 2)
-  kernel_size: Sequence[int] = (3, 3, 3)
+  task_id: int = 0
+  network_architecture: str = '3d'
+  model_depth: int = 0
   base_filters: int = 32
   use_batch_normalization: bool = True
 

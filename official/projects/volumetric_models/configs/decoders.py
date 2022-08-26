@@ -29,9 +29,9 @@ class Identity(hyperparams.Config):
 @dataclasses.dataclass
 class UNet3DDecoder(hyperparams.Config):
   """UNet3D decoder config."""
-  model_id: int = 4
-  pool_size: Sequence[int] = (2, 2, 2)
-  kernel_size: Sequence[int] = (3, 3, 3)
+  task_id: int = 0
+  network_architecture: str = '3d'
+  model_depth: int = 0
   use_batch_normalization: bool = True
   use_deconvolution: bool = True
 
