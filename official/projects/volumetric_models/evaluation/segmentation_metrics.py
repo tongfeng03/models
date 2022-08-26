@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """Metrics for segmentation."""
-from typing import Optional
+from typing import Optional, Sequence
 
 import tensorflow as tf
 from official.projects.volumetric_models.losses import segmentation_losses
@@ -36,6 +36,7 @@ class DiceScore:
   def __init__(self,
                num_classes: int,
                metric_type: Optional[str] = None,
+               axis: Optional[Sequence[int]] = (1, 2, 3),
                per_class_metric: bool = False,
                name: Optional[str] = None,
                dtype: Optional[str] = None):
@@ -51,14 +52,14 @@ class DiceScore:
     self._num_classes = num_classes
     self._per_class_metric = per_class_metric
     self._dice_op_overall = segmentation_losses.SegmentationLossDiceScore(
-        metric_type=metric_type)
+        metric_type=metric_type, axis=axis)
     self._dice_scores_overall = tf.Variable(0.0)
     self._count = tf.Variable(0.0)
 
     if self._per_class_metric:
       # Always use raw dice score for per-class metrics, so metric_type is None
       # by default.
-      self._dice_op_per_class = segmentation_losses.SegmentationLossDiceScore()
+      self._dice_op_per_class = segmentation_losses.SegmentationLossDiceScore(axis=axis)
 
       self._dice_scores_per_class = [
           tf.Variable(0.0) for _ in range(num_classes)
