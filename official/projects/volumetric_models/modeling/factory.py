@@ -47,6 +47,7 @@ def build_segmentation_model_3d(
   head = segmentation_heads_3d.SegmentationHead3D(
       num_classes=model_config.num_classes,
       level=head_config.level,
+      network_architecture=head_config.network_architecture,
       num_convs=head_config.num_convs,
       num_filters=head_config.num_filters,
       upsample_factor=head_config.upsample_factor,

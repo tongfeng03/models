@@ -35,10 +35,10 @@ class UNet3DDecoder(tf.keras.Model):
   """Class to build 3D UNet decoder."""
 
   def __init__(self,
-               model_id: int,
                input_specs: Mapping[str, tf.TensorShape],
-               pool_size: Sequence[int] = (2, 2, 2),
-               kernel_size: Sequence[int] = (3, 3, 3),
+               task_id: int = 0,
+               network_architecture: str = '3d',
+               model_depth: int = 4,
                kernel_regularizer: tf.keras.regularizers.Regularizer = None,
                activation: str = 'relu',
                norm_momentum: float = 0.99,
@@ -70,11 +70,57 @@ class UNet3DDecoder(tf.keras.Model):
         amount memory required during training. Default to False.
       **kwargs: Keyword arguments to be passed.
     """
+
+    if network_architecture == '3d':
+      POOL_SPECS = {
+        1: [(2, 2, 2), (2, 2, 2), (2, 2, 2), (2, 2, 2), (2, 2, 2)],
+        2: [(2, 2, 2), (2, 2, 2), (2, 2, 2), (2, 2, 2), (1, 2, 2)],
+        3: [(2, 2, 2), (2, 2, 2), (2, 2, 2), (2, 2, 2), (2, 2, 2)],
+        4: [(2, 2, 2), (2, 2, 2), (2, 2, 2)],
+        5: [(1, 2, 2), (1, 2, 2), (2, 2, 2), (2, 2, 2), (1, 2, 2), (1, 2, 2)],
+        6: [(2, 2, 2), (2, 2, 2), (2, 2, 2), (2, 2, 2), (1, 2, 2)],
+        7: [(1, 2, 2), (2, 2, 2), (2, 2, 2), (2, 2, 2), (1, 2, 2)],
+      }
+      KERNEL_SPECS = {
+        1: [(3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3)],
+        2: [(3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3)],
+        3: [(3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3)],
+        4: [(3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3)],
+        5: [(1, 3, 3), (1, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3)],
+        6: [(3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3)],
+        7: [(1, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3), (3, 3, 3)],
+      }
+    elif network_architecture == '2d':
+      POOL_SPECS = {
+        1: [(2, 2), (2, 2), (2, 2), (2, 2), (2, 2)],
+        2: [(2, 2), (2, 2), (2, 2), (2, 2), (2, 2), (2, 1)],
+        3: [(2, 2), (2, 2), (2, 2), (2, 2), (2, 2), (2, 2), (2, 2)],
+        4: [(2, 2), (2, 2), (2, 2)],
+        5: [(2, 2), (2, 2), (2, 2), (2, 2), (2, 2), (2, 2)],
+        6: [(2, 2), (2, 2), (2, 2), (2, 2), (2, 2), (2, 2), (2, 2)],
+        7: [(2, 2), (2, 2), (2, 2), (2, 2), (2, 2), (2, 2), (2, 2)],
+      }
+      KERNEL_SPECS = {
+        1: [(3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3)],
+        2: [(3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3)],
+        3: [(3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3)],
+        4: [(3, 3), (3, 3), (3, 3), (3, 3)],
+        5: [(3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3)],
+        6: [(3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3)],
+        7: [(3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3), (3, 3)],
+      }
+
+    self._pool_size = POOL_SPECS[task_id]
+    self._kernel_size = KERNEL_SPECS[task_id]
+    
+    pool_size = self._pool_size
+    kernel_size = self._kernel_size
+
     self._config_dict = {
-        'model_id': model_id,
         'input_specs': input_specs,
-        'pool_size': pool_size,
-        'kernel_size': kernel_size,
+        'task_id': task_id,
+        'network_architecture': network_architecture,
+        'model_depth': model_depth,
         'kernel_regularizer': kernel_regularizer,
         'activation': activation,
         'norm_momentum': norm_momentum,
@@ -95,39 +141,73 @@ class UNet3DDecoder(tf.keras.Model):
       channel_dim = 1
 
     # Build 3D UNet.
-    inputs = self._build_input_pyramid(input_specs, model_id)
+    inputs = self._build_input_pyramid(input_specs, model_depth)
 
-    # Add levels with up-convolution or up-sampling.
-    x = inputs[str(model_id)]
-    for layer_depth in range(model_id - 1, 0, -1):
-      # Apply deconvolution or upsampling.
-      if use_deconvolution:
-        x = layers.Conv3DTranspose(
-            filters=x.get_shape().as_list()[channel_dim],
-            kernel_size=pool_size,
-            strides=(2, 2, 2))(
+    if network_architecture == '3d':
+      # Add levels with up-convolution or up-sampling.
+      x = inputs[str(model_depth)]
+      for layer_depth in range(model_depth - 1, 0, -1):
+        # Apply deconvolution or upsampling.
+        if use_deconvolution:
+          x = layers.Conv3DTranspose(
+              filters=x.get_shape().as_list()[channel_dim],
+              kernel_size=pool_size[layer_depth - 1],
+              strides=pool_size[layer_depth - 1])(
+                  x)
+        else:
+          x = layers.UpSampling3D(size=pool_size[layer_depth - 1])(x)
+
+        # Concatenate upsampled features with input features from one layer up.
+        x = tf.concat([x, tf.cast(inputs[str(layer_depth)], dtype=x.dtype)],
+                      axis=channel_dim)
+        filter_num = inputs[str(layer_depth)].get_shape().as_list()[channel_dim]
+        x = nn_blocks_3d.BasicBlock3DVolume(
+            filters=[filter_num, filter_num],
+            strides=(1, 1, 1),
+            kernel_size=kernel_size[layer_depth - 1],
+            kernel_regularizer=kernel_regularizer,
+            activation=activation,
+            use_sync_bn=use_sync_bn,
+            norm_momentum=norm_momentum,
+            norm_epsilon=norm_epsilon,
+            use_batch_normalization=use_batch_normalization)(
                 x)
-      else:
-        x = layers.UpSampling3D(size=pool_size)(x)
 
-      # Concatenate upsampled features with input features from one layer up.
-      x = tf.concat([x, tf.cast(inputs[str(layer_depth)], dtype=x.dtype)],
-                    axis=channel_dim)
-      filter_num = inputs[str(layer_depth)].get_shape().as_list()[channel_dim]
-      x = nn_blocks_3d.BasicBlock3DVolume(
-          filters=[filter_num, filter_num],
-          strides=(1, 1, 1),
-          kernel_size=kernel_size,
-          kernel_regularizer=kernel_regularizer,
-          activation=activation,
-          use_sync_bn=use_sync_bn,
-          norm_momentum=norm_momentum,
-          norm_epsilon=norm_epsilon,
-          use_batch_normalization=use_batch_normalization)(
-              x)
+      feats = {'1': x}
+      self._output_specs = {l: feats[l].get_shape() for l in feats}
 
-    feats = {'1': x}
-    self._output_specs = {l: feats[l].get_shape() for l in feats}
+    elif network_architecture == '2d':
+      # Add levels with up-convolution or up-sampling.
+      x = inputs[str(model_depth)]
+      for layer_depth in range(model_depth - 1, 0, -1):
+        # Apply deconvolution or upsampling.
+        if use_deconvolution:
+          x = layers.Conv2DTranspose(
+              filters=x.get_shape().as_list()[channel_dim],
+              kernel_size=pool_size[layer_depth - 1],
+              strides=pool_size[layer_depth - 1])(
+                  x)
+        else:
+          x = layers.UpSampling2D(size=pool_size[layer_depth - 1])(x)
+
+        # Concatenate upsampled features with input features from one layer up.
+        x = tf.concat([x, tf.cast(inputs[str(layer_depth)], dtype=x.dtype)],
+                      axis=channel_dim)
+        filter_num = inputs[str(layer_depth)].get_shape().as_list()[channel_dim]
+        x = nn_blocks_3d.BasicBlock2DVolume(
+            filters=[filter_num, filter_num],
+            strides=1,
+            kernel_size=kernel_size[layer_depth - 1],
+            kernel_regularizer=kernel_regularizer,
+            activation=activation,
+            use_sync_bn=use_sync_bn,
+            norm_momentum=norm_momentum,
+            norm_epsilon=norm_epsilon,
+            use_batch_normalization=use_batch_normalization)(
+                x)
+
+      feats = {'1': x}
+      self._output_specs = {l: feats[l].get_shape() for l in feats}
 
     super(UNet3DDecoder, self).__init__(inputs=inputs, outputs=feats, **kwargs)
 
@@ -181,9 +261,10 @@ def build_unet_3d_decoder(
                                              f'{decoder_type}')
   norm_activation_config = model_config.norm_activation
   return UNet3DDecoder(
-      model_id=decoder_cfg.model_id,
       input_specs=input_specs,
-      pool_size=decoder_cfg.pool_size,
+      task_id=decoder_cfg.task_id,
+      network_architecture=decoder_cfg.network_architecture,
+      model_depth=decoder_cfg.model_depth,
       kernel_regularizer=l2_regularizer,
       activation=norm_activation_config.activation,
       norm_momentum=norm_activation_config.norm_momentum,
