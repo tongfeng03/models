@@ -6,10 +6,10 @@ from typing import Tuple
 
 # Local
 # tf.debugging.set_log_device_placement(True)
-from official.projects.volumetric_models.data_augmentations_tf.tfda_3d.augmentations.spatial_augmentations import augment_mirroring, augment_mirroring_2D, augment_spatial, augment_spatial_2D
-from official.projects.volumetric_models.data_augmentations_tf.tfda_3d.base import TFDABase
-from official.projects.volumetric_models.data_augmentations_tf.tfda_3d.defs import TFbF, TFbT, TFDAData, nan, pi
-from official.projects.volumetric_models.data_augmentations_tf.tfda_3d.utils import isnotnan
+from official.projects.volumetric_models.data_augmentations.tfda_3d.augmentations.spatial_augmentations import augment_mirroring, augment_mirroring_2D, augment_spatial, augment_spatial_2D
+from official.projects.volumetric_models.data_augmentations.tfda_3d.base import TFDABase
+from official.projects.volumetric_models.data_augmentations.tfda_3d.defs import TFbF, TFbT, TFDAData, nan, pi
+from official.projects.volumetric_models.data_augmentations.tfda_3d.utils import isnotnan
 
 
 class SpatialTransform(TFDABase):

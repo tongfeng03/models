@@ -2,9 +2,9 @@
 import tensorflow as tf
 
 # Local
-from official.projects.volumetric_models.data_augmentations_tf.tfda_3d.base import TFDABase
-from official.projects.volumetric_models.data_augmentations_tf.tfda_3d.defs import DTFT, TFDAData
-from official.projects.volumetric_models.data_augmentations_tf.tfda_3d.augmentations.utils import to_one_hot
+from official.projects.volumetric_models.data_augmentations.tfda_3d.base import TFDABase
+from official.projects.volumetric_models.data_augmentations.tfda_3d.defs import DTFT, TFDAData
+from official.projects.volumetric_models.data_augmentations.tfda_3d.augmentations.utils import to_one_hot
 
 
 class Convert3DTo2DTransform(TFDABase):

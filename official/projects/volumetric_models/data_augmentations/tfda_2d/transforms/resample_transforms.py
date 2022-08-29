@@ -4,13 +4,13 @@ import tensorflow as tf
 # tf.config.run_functions_eagerly(True)
 
 # Local
-from official.projects.volumetric_models.data_augmentations_tf.tfda_2d.augmentations.resample_augmentations import (
+from official.projects.volumetric_models.data_augmentations.tfda_2d.augmentations.resample_augmentations import (
     augment_linear_downsampling_scipy,
     augment_linear_downsampling_scipy_2D,
 )
-from official.projects.volumetric_models.data_augmentations_tf.tfda_2d.base import TFDABase
-from official.projects.volumetric_models.data_augmentations_tf.tfda_2d.defs import TFbT, TFDAData, nan
-from official.projects.volumetric_models.data_augmentations_tf.tfda_2d.utils import isnan, isnotnan
+from official.projects.volumetric_models.data_augmentations.tfda_2d.base import TFDABase
+from official.projects.volumetric_models.data_augmentations.tfda_2d.defs import TFbT, TFDAData, nan
+from official.projects.volumetric_models.data_augmentations.tfda_2d.utils import isnan, isnotnan
 
 
 

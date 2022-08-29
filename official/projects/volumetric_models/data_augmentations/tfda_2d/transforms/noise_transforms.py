@@ -4,12 +4,12 @@ import tensorflow as tf
 tf.debugging.set_log_device_placement(True)
 # Local
 # tf.config.run_functions_eagerly(True)
-from official.projects.volumetric_models.data_augmentations_tf.tfda_2d.augmentations.noise_augmentations import (
+from official.projects.volumetric_models.data_augmentations.tfda_2d.augmentations.noise_augmentations import (
     augment_gaussian_blur,
     augment_gaussian_noise,
 )
-from official.projects.volumetric_models.data_augmentations_tf.tfda_2d.base import TFDABase
-from official.projects.volumetric_models.data_augmentations_tf.tfda_2d.defs import TFbF, TFbT, TFDAData
+from official.projects.volumetric_models.data_augmentations.tfda_2d.base import TFDABase
+from official.projects.volumetric_models.data_augmentations.tfda_2d.defs import TFbF, TFbT, TFDAData
 
 
 class GaussianNoiseTransform(TFDABase):

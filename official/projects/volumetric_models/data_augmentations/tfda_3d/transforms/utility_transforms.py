@@ -2,8 +2,8 @@
 import tensorflow as tf
 
 # Local
-from official.projects.volumetric_models.data_augmentations_tf.tfda_3d.base import TFDABase
-from official.projects.volumetric_models.data_augmentations_tf.tfda_3d.defs import DTFT, TFDAData
+from official.projects.volumetric_models.data_augmentations.tfda_3d.base import TFDABase
+from official.projects.volumetric_models.data_augmentations.tfda_3d.defs import DTFT, TFDAData
 
 
 class RemoveLabelTransform(TFDABase):

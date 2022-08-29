@@ -3,9 +3,9 @@ import tensorflow as tf
 
 # Local
 # tf.debugging.set_log_device_placement(True)
-from official.projects.volumetric_models.data_augmentations_tf.tfda_2d.augmentations.utils import gaussian_filter, gaussian_filter_2D, get_range_val
-from official.projects.volumetric_models.data_augmentations_tf.tfda_2d.defs import nan
-from official.projects.volumetric_models.data_augmentations_tf.tfda_2d.utils import isnotnan
+from official.projects.volumetric_models.data_augmentations.tfda_2d.augmentations.utils import gaussian_filter, gaussian_filter_2D, get_range_val
+from official.projects.volumetric_models.data_augmentations.tfda_2d.defs import nan
+from official.projects.volumetric_models.data_augmentations.tfda_2d.utils import isnotnan
 
 
 @tf.function(input_signature=[tf.TensorSpec(shape=(2,), dtype=tf.float32)])
