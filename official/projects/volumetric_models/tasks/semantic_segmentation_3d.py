@@ -28,6 +28,7 @@ from official.projects.volumetric_models.dataloaders import segmentation_input_3
 from official.projects.volumetric_models.evaluation import segmentation_metrics
 from official.projects.volumetric_models.losses import segmentation_losses
 from official.projects.volumetric_models.modeling import factory
+from official.modeling import tf_utils
 
 
 @task_factory.register_task_cls(exp_cfg.SemanticSegmentation3DTask)
@@ -133,10 +134,25 @@ class SemanticSegmentation3DTask(base_task.Task):
     Returns:
       The total loss tensor.
     """
-    segmentation_loss_fn = segmentation_losses.SegmentationLossDiceScore(
-        metric_type='adaptive')
+    if self.task_config.model.backbone.unet_3d.network_architecture == '3d':
+      segmentation_loss_fn = segmentation_losses.SegmentationLossDiceScore(
+          metric_type="smooth", 
+          axis=(1, 2, 3))  # 3d
+    elif self.task_config.model.backbone.unet_3d.network_architecture == '2d':
+      segmentation_loss_fn = segmentation_losses.SegmentationLossDiceScore(
+          metric_type="smooth", 
+          axis=(0, 1, 2))  # TODO
 
-    total_loss = segmentation_loss_fn(model_outputs, labels)
+    dc_loss = segmentation_loss_fn(model_outputs[:,:,:,:,1:], labels[:,:,:,:,1:])
+
+    ce_loss = tf.keras.losses.categorical_crossentropy(
+        labels,
+        model_outputs,
+        from_logits=True,
+        label_smoothing=0.0)
+    ce_loss = tf_utils.safe_mean(ce_loss)
+
+    total_loss = dc_loss + ce_loss
 
     if aux_losses:
       total_loss += tf.add_n(aux_losses)
@@ -154,15 +170,28 @@ class SemanticSegmentation3DTask(base_task.Task):
               name='train_categorical_accuracy', dtype=tf.float32)
       ])
     else:
-      self.metrics = [
-          segmentation_metrics.DiceScore(
-              num_classes=num_classes,
-              metric_type='generalized',
-              per_class_metric=self.task_config.evaluation
-              .report_per_class_metric,
-              name='val_generalized_dice',
-              dtype=tf.float32)
-      ]
+      if self.task_config.model.backbone.unet_3d.network_architecture == '3d':
+        self.metrics = [
+            segmentation_metrics.DiceScore(
+                num_classes=num_classes,
+                metric_type=None,
+                axis=(1, 2, 3),  # 3d
+                per_class_metric=self.task_config.evaluation
+                .report_per_class_metric,
+                name='val_dice',
+                dtype=tf.float32)
+        ]
+      elif self.task_config.model.backbone.unet_3d.network_architecture == '2d':
+        self.metrics = [
+            segmentation_metrics.DiceScore(
+                num_classes=num_classes,
+                metric_type=None,
+                axis=(0, 1, 2),  # TODO
+                per_class_metric=self.task_config.evaluation
+                .report_per_class_metric,
+                name='val_dice',
+                dtype=tf.float32)
+        ]
 
     return metrics
 
