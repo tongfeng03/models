@@ -55,6 +55,7 @@ class Parser(parser.Parser):
   """Parser to parse an image and its annotations into a dictionary of tensors."""
 
   def __init__(self,
+               task_id: int = 4,
                input_size: Sequence[int] = [40, 56, 40],
                num_classes: int = 3,
                num_channels: int = 1,
@@ -76,7 +77,135 @@ class Parser(parser.Parser):
       dtype: The data type. One of {`bfloat16`, `float32`, `float16`}.
       label_dtype: The data type of input label.
     """
+    self._DA_params = {
+      "do_elastic": {
+        1: TFbF,
+        2: TFbF,
+        4: TFbF,
+      },
+      "elastic_deform_alpha": {
+        1: (0.0, 900.0),
+        2: (0.0, 900.0),
+        4: (0.0, 900.0),
+      },      
+      "elastic_deform_sigma": {
+        1: (9.0, 13.0),
+        2: (9.0, 13.0),
+        4: (9.0, 13.0),
+      },
+
+      "rotation_x": {
+        1: (-0.5235987755982988, 0.5235987755982988),
+        2: (-0.5235987755982988, 0.5235987755982988),
+        4: (-0.5235987755982988, 0.5235987755982988),
+      },
+      "rotation_y": {
+        1: (-0.5235987755982988, 0.5235987755982988),
+        2: (-0.5235987755982988, 0.5235987755982988),
+        4: (-0.5235987755982988, 0.5235987755982988),
+      },
+      "rotation_z": {
+        1: (-0.5235987755982988, 0.5235987755982988),
+        2: (-0.5235987755982988, 0.5235987755982988),
+        4: (-0.5235987755982988, 0.5235987755982988),
+      },
+      "rotation_p_per_axis": {
+        1: 1.0,
+        2: 1.0,
+        4: 1.0,
+      },
+
+      "do_scaling": {
+        1: True,
+        2: True,
+        4: True,
+      },
+      "scale_range": {
+        1: (0.7, 1.4),
+        2: (0.7, 1.4),
+        4: (0.7, 1.4),
+      },
+
+      "random_crop": {
+        1: False,
+        2: False,
+        4: False,
+      },
+      "p_eldef": {
+        1: 0.2,
+        2: 0.2,
+        4: 0.2,
+      },
+      "p_scale": {
+        1: 0.2,
+        2: 0.2,
+        4: 0.2,
+      },
+      "p_rot": {
+        1: 0.2,
+        2: 0.2,
+        4: 0.2,
+      },
+      "independent_scale_factor_for_each_axis": {
+        1: False,
+        2: False,
+        4: False,
+      },
+
+      "ignore_axes": {
+        1: nan,
+        2: nan,
+        4: nan,
+      },
+
+      "gamma_range": {
+        1: (0.7, 1.5),
+        2: (0.7, 1.5),
+        4: (0.7, 1.5),
+      },
+
+      "gamma_retain_stats": {
+        1: True,
+        2: True,
+        4: True,
+      },
+      "p_gamma": {
+        1: 0.3,
+        2: 0.3,
+        4: 0.3,
+      },
+
+      "mirror_axes": {
+        1: (0, 1, 2),
+        2: (0, 1, 2),
+        4: (0, 1, 2),
+      },
+
+      "mask_was_used_for_normalization": {
+        1: [[0, 0], [1, 0], [2, 0], [3, 0]],
+        2: [[0, 1]],
+        4: [[0, 0], [1, 0]],
+      },
+
+      "one_hot_axis": {
+        1: [0, 1, 2, 3],
+        2: [0, 1],
+        4: [0, 1, 2],
+      },
+    }
+
+    basic_generator_patch_size = {
+      1: [205, 205, 205],
+      2: [194, 289, 210],
+      3: [205, 205, 205],
+      4: [73, 80, 64],
+      5: [20, 376, 376],
+      6: [194, 289, 210],
+      7: [40, 263, 263],
+    }
+    self._task_id = task_id 
     self._input_size = input_size
+    self._basic_generator_patch_size = basic_generator_patch_size[task_id]
     self._num_classes = num_classes
     self._num_channels = num_channels
     self._image_field_key = image_field_key
@@ -149,13 +278,13 @@ class Parser(parser.Parser):
     return image, label
 
   def _data_augmentation_tr(self, image, label):
-    image, label = process_batch(image, label[tf.newaxis,], [73, 80, 64], [40, 56, 40])
-    image, label = tf_tr_transforms(image, label)
+    image, label = process_batch(image, label[tf.newaxis,], self._basic_generator_patch_size, self._input_size)
+    image, label = self._tf_tr_transforms(image, label)
     return image[0], label[0]
 
   def _data_augmentation_val(self, image, label):
-    image, label = process_batch(image, label[tf.newaxis,], [40, 56, 40], [40, 56, 40])
-    image, label = tf_val_transforms(image, label)
+    image, label = process_batch(image, label[tf.newaxis,], self._input_size, self._input_size)
+    image, label = self._tf_val_transforms(image, label)
     return image[0], label[0]
 
   def _parse_train_data(self, data: Dict[str,
@@ -176,45 +305,107 @@ class Parser(parser.Parser):
 
     return image, labels
 
+  def _tf_tr_transforms(self, images, segs):
+    # tf.config.run_functions_eagerly(True)
+    data_dict = TFDAData(data=images, seg=segs)
+    # tf.print(tf.shape(data_dict.data), tf.shape(data_dict.seg))
 
-def tr_transforms(image, label):
-    data_dict = {'data': image, 'seg': label}
-    data_dict = SpatialTransform(patch_size=[40, 56, 40], patch_center_dist_from_border=None,
-                                 do_elastic_deform=False, alpha=(0.0, 900.0), sigma=(9.0, 13.0),
-                                 do_rotation=True, angle_x=(-0.5235987755982988, 0.5235987755982988),
-                                 angle_y=(-0.5235987755982988, 0.5235987755982988),
-                                 angle_z=(-0.5235987755982988, 0.5235987755982988), p_rot_per_axis=1,
-                                 do_scale=True, scale=(0.7, 1.4), border_mode_data='constant', border_cval_data=0,
-                                 order_data=3, border_mode_seg="constant", border_cval_seg=-1, order_seg=1,
-                                 random_crop=False, p_el_per_sample=0.2, p_scale_per_sample=0.2, p_rot_per_sample=0.2,
-                                 independent_scale_for_each_axis=False)(**data_dict)
-    data_dict = GaussianNoiseTransform(p_per_sample=0.1)(**data_dict)
-    data_dict = GaussianBlurTransform((0.5, 1.), different_sigma_per_channel=True, p_per_sample=0.2,
-                                      p_per_channel=0.5)(**data_dict)
-    data_dict = BrightnessMultiplicativeTransform(multiplier_range=(0.75, 1.25), p_per_sample=0.15)(**data_dict)
-    data_dict = ContrastAugmentationTransform(p_per_sample=0.15)(**data_dict)
-    data_dict = SimulateLowResolutionTransform(zoom_range=(0.5, 1), per_channel=True, p_per_channel=0.5,
-                                               order_downsample=0, order_upsample=3, p_per_sample=0.25,
-                                               ignore_axes=None)(**data_dict)
-    data_dict = GammaTransform((0.7, 1.5), True, True, retain_stats=True, p_per_sample=0.1)(**data_dict)
-    data_dict = GammaTransform((0.7, 1.5), False, True, retain_stats=True, p_per_sample=0.3)(**data_dict)
-    data_dict = MirrorTransform((0, 1, 2))(**data_dict)
-    data_dict = MaskTransform([(0, False)], mask_idx_in_seg=0, set_outside_to=0)(**data_dict)
-    data_dict = RemoveLabelTransform(-1, 0)(**data_dict)
+    data_dict = SpatialTransform(
+      patch_size=self._input_size, #
+      patch_center_dist_from_border=nan,
+      do_elastic_deform=self._DA_params["do_elastic"][self._task_id], # 
+      alpha=self._DA_params["elastic_deform_alpha"][self._task_id], #
+      sigma=self._DA_params["elastic_deform_sigma"][self._task_id], #
+      do_rotation=True, 
+      # angle_x=(tf.constant(-0.5235987755982988), tf.constant(0.5235987755982988)), #
+      angle_x=self._DA_params["rotation_x"][self._task_id], #
+      angle_y=self._DA_params["rotation_y"][self._task_id], #
+      angle_z=self._DA_params["rotation_z"][self._task_id], #
+      p_rot_per_axis=self._DA_params["rotation_p_per_axis"][self._task_id], #
+      do_scale=self._DA_params["do_scaling"][self._task_id], #
+      scale=self._DA_params["scale_range"][self._task_id], #
+      border_mode_data='constant', 
+      border_cval_data=0,
+      order_data=3, 
+      border_mode_seg="constant", 
+      border_cval_seg=-1, 
+      order_seg=1,
+      random_crop=self._DA_params["random_crop"][self._task_id], #
+      p_el_per_sample=self._DA_params["p_eldef"][self._task_id], #
+      p_scale_per_sample=self._DA_params["p_scale"][self._task_id], #
+      p_rot_per_sample=self._DA_params["p_rot"][self._task_id], #
+      independent_scale_for_each_axis=self._DA_params["independent_scale_factor_for_each_axis"][self._task_id] #
+      )(data_dict)
+      # tf.config.run_functions_eagerly(False)
 
-    image = data_dict['data']
-    label = data_dict['seg']
-    return image, label
+    data_dict = GaussianNoiseTransform(
+      data_key="data", label_key="seg", p_per_channel=0.01)(data_dict)
+    
+    data_dict = GaussianBlurTransform(
+      (0.5, 1.), 
+      different_sigma_per_channel=True, 
+      p_per_sample=0.2,
+      p_per_channel=0.5
+      )(data_dict)
+    
+    data_dict = BrightnessMultiplicativeTransform(
+      multiplier_range=(0.75, 1.25), 
+      p_per_sample=0.15
+      )(data_dict)
+    
+    data_dict = ContrastAugmentationTransform(p_per_sample=0.15)(data_dict)
+    
+    data_dict = SimulateLowResolutionTransform(
+      zoom_range=(0.5, 1), 
+      per_channel=True, 
+      p_per_channel=0.5,
+      order_downsample=0, 
+      order_upsample=3, 
+      p_per_sample=0.25,
+      ignore_axes=self._DA_params["ignore_axes"][self._task_id]
+      )(data_dict)
+      
+    data_dict = GammaTransform(
+      self._DA_params["gamma_range"][self._task_id], #
+      True, True, 
+      retain_stats=self._DA_params["gamma_retain_stats"][self._task_id], #
+      p_per_sample=0.1
+      )(data_dict)
+    
+    data_dict = GammaTransform(
+      self._DA_params["gamma_range"][self._task_id], #
+      False, True, 
+      retain_stats=self._DA_params["gamma_retain_stats"][self._task_id], #
+      p_per_sample=self._DA_params["p_gamma"][self._task_id] #
+      )(data_dict)
+    
+    data_dict = MirrorTransform(
+      self._DA_params["mirror_axes"][self._task_id] #
+      )(data_dict) 
+    
+    data_dict = MaskTransform(
+      tf.constant(self._DA_params["mask_was_used_for_normalization"][self._task_id]), #
+      mask_idx_in_seg=0, 
+      set_outside_to=0.0
+      )(data_dict)
 
+    data_dict = RemoveLabelTransform(-1, 0)(data_dict)
+    
+    data_dict = OneHotTransform(
+      tuple([float(key) for key in self._DA_params["one_hot_axis"][self._task_id]]) #
+      )(data_dict) 
 
-def val_transforms(image, label):
-    data_dict = {'data': image, 'seg': label}
+    # tf.print('tr', tf.shape(data_dict.data))
+    return data_dict.data, data_dict.seg
 
-    data_dict = RemoveLabelTransform(-1, 0)(**data_dict)
-
-    image = data_dict['data']
-    label = data_dict['seg']
-    return image, label
+  def _tf_val_transforms(self, images, segs):
+    data_dict = TFDAData(data=images, seg=segs)
+    data_dict = RemoveLabelTransform(-1, 0)(TFDAData(data=images, seg=segs))
+    data_dict = OneHotTransform(
+      tuple([float(key) for key in self._DA_params["one_hot_axis"][self._task_id]])
+      )(data_dict) #
+    # tf.print('val', tf.shape(data_dict.data))
+    return data_dict.data, data_dict.seg
 
 
 # @tf.function
@@ -354,106 +545,3 @@ def not_force_fg(lb_x, ub_x, lb_y, ub_y, lb_z, ub_z):
         [], minval=lb_z, maxval=ub_z + 1, dtype=tf.int64
     )
     return bbox_x_lb, bbox_y_lb, bbox_z_lb
-
-
-def tf_tr_transforms(images, segs):
-  # tf.config.run_functions_eagerly(True)
-  data_dict = TFDAData(data=images, seg=segs)
-  # tf.print(tf.shape(data_dict.data), tf.shape(data_dict.seg))
-
-  data_dict = SpatialTransform(
-    patch_size=[40, 56, 40], #
-    patch_center_dist_from_border=nan,
-    do_elastic_deform=TFbF, # 
-    alpha=(0.0, 900.0), #
-    sigma=(9.0, 13.0), #
-    do_rotation=True, 
-    # angle_x=(tf.constant(-0.5235987755982988), tf.constant(0.5235987755982988)), #
-    angle_x=(-0.5235987755982988, 0.5235987755982988), #
-    angle_y=(tf.constant(-0.5235987755982988), tf.constant(0.5235987755982988)), #
-    angle_z=(tf.constant(-0.5235987755982988), tf.constant(0.5235987755982988)), #
-    p_rot_per_axis=1.0, #
-    do_scale=True, #
-    scale=(0.7, 1.4), #
-    border_mode_data='constant', 
-    border_cval_data=0,
-    order_data=3, 
-    border_mode_seg="constant", 
-    border_cval_seg=-1, 
-    order_seg=1,
-    random_crop=False, #
-    p_el_per_sample=0.2, #
-    p_scale_per_sample=0.2, #
-    p_rot_per_sample=0.2, #
-    independent_scale_for_each_axis=False #
-    )(data_dict)
-    # tf.config.run_functions_eagerly(False)
-
-  data_dict = GaussianNoiseTransform(
-    data_key="data", label_key="seg", p_per_channel=0.01)(data_dict)
-  
-  data_dict = GaussianBlurTransform(
-    (0.5, 1.), 
-    different_sigma_per_channel=True, 
-    p_per_sample=0.2,
-    p_per_channel=0.5
-    )(data_dict)
-  
-  data_dict = BrightnessMultiplicativeTransform(
-    multiplier_range=(0.75, 1.25), 
-    p_per_sample=0.15
-    )(data_dict)
-  
-  data_dict = ContrastAugmentationTransform(p_per_sample=0.15)(data_dict)
-  
-  data_dict = SimulateLowResolutionTransform(
-    zoom_range=(0.5, 1), 
-    per_channel=True, 
-    p_per_channel=0.5,
-    order_downsample=0, 
-    order_upsample=3, 
-    p_per_sample=0.25
-    # ignore_axes=None
-    )(data_dict)
-    
-  data_dict = GammaTransform(
-    (0.7, 1.5), #
-    True, True, 
-    retain_stats=True, #
-    p_per_sample=0.1
-    )(data_dict)
-  
-  data_dict = GammaTransform(
-    (0.7, 1.5), #
-    False, True, 
-    retain_stats=True, #
-    p_per_sample=0.3 #
-    )(data_dict)
-  
-  data_dict = MirrorTransform(
-    (0, 1, 2) #
-    )(data_dict) 
-  
-  data_dict = MaskTransform(
-    tf.constant([[0, 0], [1, 0]]), #
-    mask_idx_in_seg=0, 
-    set_outside_to=0.0
-    )(data_dict)
-
-  data_dict = RemoveLabelTransform(-1, 0)(data_dict)
-  
-  data_dict = OneHotTransform(
-    tuple([float(key) for key in [0, 1, 2]]) #
-    )(data_dict) 
-
-  # tf.print('tr', tf.shape(data_dict.data))
-  return data_dict.data, data_dict.seg
-
-def tf_val_transforms(images, segs):
-  data_dict = TFDAData(data=images, seg=segs)
-  data_dict = RemoveLabelTransform(-1, 0)(TFDAData(data=images, seg=segs))
-  data_dict = OneHotTransform(
-    tuple([float(key) for key in [0, 1, 2]])
-    )(data_dict) #
-  # tf.print('val', tf.shape(data_dict.data))
-  return data_dict.data, data_dict.seg

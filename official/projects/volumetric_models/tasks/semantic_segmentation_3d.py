@@ -102,6 +102,7 @@ class SemanticSegmentation3DTask(base_task.Task):
         image_field_key=params.image_field_key,
         label_field_key=params.label_field_key)
     parser = segmentation_input_3d.Parser(
+        task_id=self.task_config.model.backbone.unet_3d.task_id,
         input_size=params.input_size,
         num_classes=params.num_classes,
         num_channels=params.num_channels,
