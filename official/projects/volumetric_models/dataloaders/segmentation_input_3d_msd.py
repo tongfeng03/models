@@ -78,119 +78,147 @@ class Parser(parser.Parser):
       label_dtype: The data type of input label.
     """
     self._DA_params = {
+      "patch_size": {
+        1: [128, 128, 128],
+        2: [80, 192, 160],
+        4: [40, 56, 40],
+        5: [320, 256],
+      },
+      
       "do_elastic": {
         1: TFbF,
         2: TFbF,
         4: TFbF,
+        5: TFbF,
       },
       "elastic_deform_alpha": {
         1: (0.0, 900.0),
         2: (0.0, 900.0),
         4: (0.0, 900.0),
+        5: (0.0, 200.0),
       },      
       "elastic_deform_sigma": {
         1: (9.0, 13.0),
         2: (9.0, 13.0),
         4: (9.0, 13.0),
+        5: (9.0, 13.0),
       },
 
       "rotation_x": {
         1: (-0.5235987755982988, 0.5235987755982988),
         2: (-0.5235987755982988, 0.5235987755982988),
         4: (-0.5235987755982988, 0.5235987755982988),
+        5: (-3.141592653589793, 3.141592653589793),
       },
       "rotation_y": {
         1: (-0.5235987755982988, 0.5235987755982988),
         2: (-0.5235987755982988, 0.5235987755982988),
         4: (-0.5235987755982988, 0.5235987755982988),
+        5: (-0.5235987755982988, 0.5235987755982988),
       },
       "rotation_z": {
         1: (-0.5235987755982988, 0.5235987755982988),
         2: (-0.5235987755982988, 0.5235987755982988),
         4: (-0.5235987755982988, 0.5235987755982988),
+        5: (-0.5235987755982988, 0.5235987755982988),
       },
       "rotation_p_per_axis": {
         1: 1.0,
         2: 1.0,
         4: 1.0,
+        5: 1.0,
       },
 
       "do_scaling": {
         1: True,
         2: True,
         4: True,
+        5: True,
       },
       "scale_range": {
         1: (0.7, 1.4),
         2: (0.7, 1.4),
         4: (0.7, 1.4),
+        5: (0.7, 1.4),
       },
 
       "random_crop": {
         1: False,
         2: False,
         4: False,
+        5: False,
       },
       "p_eldef": {
         1: 0.2,
         2: 0.2,
         4: 0.2,
+        5: 0.2,
       },
       "p_scale": {
         1: 0.2,
         2: 0.2,
         4: 0.2,
+        5: 0.2,
       },
       "p_rot": {
         1: 0.2,
         2: 0.2,
         4: 0.2,
+        5: 0.2,
       },
       "independent_scale_factor_for_each_axis": {
         1: False,
         2: False,
         4: False,
+        5: False,
       },
 
       "ignore_axes": {
         1: nan,
         2: nan,
         4: nan,
+        5: (0,),
       },
 
       "gamma_range": {
         1: (0.7, 1.5),
         2: (0.7, 1.5),
         4: (0.7, 1.5),
+        5: (0.7, 1.5),
       },
 
       "gamma_retain_stats": {
         1: True,
         2: True,
         4: True,
+        5: True,
       },
       "p_gamma": {
         1: 0.3,
         2: 0.3,
         4: 0.3,
+        5: 0.3,
       },
 
       "mirror_axes": {
         1: (0, 1, 2),
         2: (0, 1, 2),
         4: (0, 1, 2),
+        5: (0, 1, 2),
       },
 
       "mask_was_used_for_normalization": {
         1: [[0, 0], [1, 0], [2, 0], [3, 0]],
         2: [[0, 1]],
         4: [[0, 0], [1, 0]],
+        5: [[0, 0], [1, 0]],
       },
 
       "one_hot_axis": {
         1: [0, 1, 2, 3],
         2: [0, 1],
         4: [0, 1, 2],
+        5: [0, 1, 2],
       },
     }
 
@@ -310,33 +338,65 @@ class Parser(parser.Parser):
     data_dict = TFDAData(data=images, seg=segs)
     # tf.print(tf.shape(data_dict.data), tf.shape(data_dict.seg))
 
-    data_dict = SpatialTransform(
-      patch_size=self._input_size, #
-      patch_center_dist_from_border=nan,
-      do_elastic_deform=self._DA_params["do_elastic"][self._task_id], # 
-      alpha=self._DA_params["elastic_deform_alpha"][self._task_id], #
-      sigma=self._DA_params["elastic_deform_sigma"][self._task_id], #
-      do_rotation=True, 
-      # angle_x=(tf.constant(-0.5235987755982988), tf.constant(0.5235987755982988)), #
-      angle_x=self._DA_params["rotation_x"][self._task_id], #
-      angle_y=self._DA_params["rotation_y"][self._task_id], #
-      angle_z=self._DA_params["rotation_z"][self._task_id], #
-      p_rot_per_axis=self._DA_params["rotation_p_per_axis"][self._task_id], #
-      do_scale=self._DA_params["do_scaling"][self._task_id], #
-      scale=self._DA_params["scale_range"][self._task_id], #
-      border_mode_data='constant', 
-      border_cval_data=0,
-      order_data=3, 
-      border_mode_seg="constant", 
-      border_cval_seg=-1, 
-      order_seg=1,
-      random_crop=self._DA_params["random_crop"][self._task_id], #
-      p_el_per_sample=self._DA_params["p_eldef"][self._task_id], #
-      p_scale_per_sample=self._DA_params["p_scale"][self._task_id], #
-      p_rot_per_sample=self._DA_params["p_rot"][self._task_id], #
-      independent_scale_for_each_axis=self._DA_params["independent_scale_factor_for_each_axis"][self._task_id] #
-      )(data_dict)
-      # tf.config.run_functions_eagerly(False)
+    if self._task_id in [5, 7]:
+      data_dict = Convert3DTo2DTransform()(data_dict)
+      data_dict = SpatialTransform2D(
+        patch_size=self._DA_params["patch_size"][self._task_id], #
+        patch_center_dist_from_border=nan,
+        do_elastic_deform=self._DA_params["do_elastic"][self._task_id], # 
+        alpha=self._DA_params["elastic_deform_alpha"][self._task_id], #
+        sigma=self._DA_params["elastic_deform_sigma"][self._task_id], #
+        do_rotation=True, 
+        # angle_x=(tf.constant(-0.5235987755982988), tf.constant(0.5235987755982988)), #
+        angle_x=self._DA_params["rotation_x"][self._task_id], #
+        angle_y=self._DA_params["rotation_y"][self._task_id], #
+        angle_z=self._DA_params["rotation_z"][self._task_id], #
+        p_rot_per_axis=self._DA_params["rotation_p_per_axis"][self._task_id], #
+        do_scale=self._DA_params["do_scaling"][self._task_id], #
+        scale=self._DA_params["scale_range"][self._task_id], #
+        border_mode_data='constant', 
+        border_cval_data=0,
+        order_data=3, 
+        border_mode_seg="constant", 
+        border_cval_seg=-1, 
+        order_seg=1,
+        random_crop=self._DA_params["random_crop"][self._task_id], #
+        p_el_per_sample=self._DA_params["p_eldef"][self._task_id], #
+        p_scale_per_sample=self._DA_params["p_scale"][self._task_id], #
+        p_rot_per_sample=self._DA_params["p_rot"][self._task_id], #
+        independent_scale_for_each_axis=self._DA_params["independent_scale_factor_for_each_axis"][self._task_id] #
+        )(data_dict)
+        # tf.config.run_functions_eagerly(False)
+      data_dict = Convert2DTo3DTransform()(data_dict)
+
+    else:
+      data_dict = SpatialTransform(
+        patch_size=self._DA_params["patch_size"][self._task_id], #
+        patch_center_dist_from_border=nan,
+        do_elastic_deform=self._DA_params["do_elastic"][self._task_id], # 
+        alpha=self._DA_params["elastic_deform_alpha"][self._task_id], #
+        sigma=self._DA_params["elastic_deform_sigma"][self._task_id], #
+        do_rotation=True, 
+        # angle_x=(tf.constant(-0.5235987755982988), tf.constant(0.5235987755982988)), #
+        angle_x=self._DA_params["rotation_x"][self._task_id], #
+        angle_y=self._DA_params["rotation_y"][self._task_id], #
+        angle_z=self._DA_params["rotation_z"][self._task_id], #
+        p_rot_per_axis=self._DA_params["rotation_p_per_axis"][self._task_id], #
+        do_scale=self._DA_params["do_scaling"][self._task_id], #
+        scale=self._DA_params["scale_range"][self._task_id], #
+        border_mode_data='constant', 
+        border_cval_data=0,
+        order_data=3, 
+        border_mode_seg="constant", 
+        border_cval_seg=-1, 
+        order_seg=1,
+        random_crop=self._DA_params["random_crop"][self._task_id], #
+        p_el_per_sample=self._DA_params["p_eldef"][self._task_id], #
+        p_scale_per_sample=self._DA_params["p_scale"][self._task_id], #
+        p_rot_per_sample=self._DA_params["p_rot"][self._task_id], #
+        independent_scale_for_each_axis=self._DA_params["independent_scale_factor_for_each_axis"][self._task_id] #
+        )(data_dict)
+        # tf.config.run_functions_eagerly(False)
 
     data_dict = GaussianNoiseTransform(
       data_key="data", label_key="seg", p_per_channel=0.01)(data_dict)
