@@ -2,8 +2,8 @@
 import tensorflow as tf
 
 # Local
-from official.projects.volumetric_models.data_augmentations.tfda_3d.defs import nan
-from official.projects.volumetric_models.data_augmentations.tfda_3d.utils import to_tf_float, to_tf_int
+from data_augmentations.tfda_3d.defs import nan
+from data_augmentations.tfda_3d.utils import to_tf_float, to_tf_int
 
 # tf.debugging.set_log_device_placement(True)
 

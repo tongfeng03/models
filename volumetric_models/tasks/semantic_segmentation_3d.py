@@ -23,11 +23,11 @@ from official.common import dataset_fn
 from official.core import base_task
 from official.core import input_reader
 from official.core import task_factory
-from official.projects.volumetric_models.configs import semantic_segmentation_3d as exp_cfg
-from official.projects.volumetric_models.dataloaders import segmentation_input_3d_msd as segmentation_input_3d
-from official.projects.volumetric_models.evaluation import segmentation_metrics
-from official.projects.volumetric_models.losses import segmentation_losses
-from official.projects.volumetric_models.modeling import factory
+from configs import semantic_segmentation_3d as exp_cfg
+from dataloaders import segmentation_input_3d_msd as segmentation_input_3d
+from evaluation import segmentation_metrics
+from losses import segmentation_losses
+from modeling import factory
 from official.modeling import tf_utils
 
 

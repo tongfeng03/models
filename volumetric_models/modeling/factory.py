@@ -19,8 +19,8 @@
 import tensorflow as tf
 
 from official.modeling import hyperparams
-from official.projects.volumetric_models.modeling.decoders import factory as decoder_factory
-from official.projects.volumetric_models.modeling.heads import segmentation_heads_3d
+from modeling.decoders import factory as decoder_factory
+from modeling.heads import segmentation_heads_3d
 from official.vision.beta.modeling import segmentation_model
 from official.vision.beta.modeling.backbones import factory as backbone_factory
 

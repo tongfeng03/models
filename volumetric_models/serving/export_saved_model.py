@@ -39,10 +39,10 @@ output = model_fn(input_images)
 from absl import app
 from absl import flags
 
-from official.projects.volumetric_models import registry_imports  # pylint: disable=unused-import
+import registry_imports  # pylint: disable=unused-import
 from official.core import exp_factory
 from official.modeling import hyperparams
-from official.projects.volumetric_models.serving import semantic_segmentation_3d
+from serving import semantic_segmentation_3d
 from official.vision.beta.serving import export_saved_model_lib
 
 FLAGS = flags.FLAGS

@@ -1,4 +1,5 @@
 # TensorFlow nnUNet 
+This TF nnUNet code is implemented based on TensorFlow volumetric models from TensorFlow Model Garden vision projects. The TensorFlow Model Garden is used as a subfolder in `tf_nnunet/models`. After downloading this repository, the `PYTHONPATH` should be set to `XXX(path to tf_nnunet folder)/tf_nnunet/models`.
 
 ## nnUNet Installation
 

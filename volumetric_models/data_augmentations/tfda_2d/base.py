@@ -8,7 +8,7 @@ from typing import Any
 
 # Local
 # tf.debugging.set_log_device_placement(True)
-from official.projects.volumetric_models.data_augmentations.tfda_2d.defs import TFDADefs, nan
+from data_augmentations.tfda_2d.defs import TFDADefs, nan
 
 
 class TFDABase(tf.keras.layers.Layer):

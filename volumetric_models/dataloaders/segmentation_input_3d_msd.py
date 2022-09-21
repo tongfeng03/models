@@ -20,14 +20,14 @@ from official.vision.beta.dataloaders import decoder
 from official.vision.beta.dataloaders import parser
 import numpy as np
 
-from official.projects.volumetric_models.data_augmentations.tfda_3d.transforms.spatial_transforms import SpatialTransform, MirrorTransform, SpatialTransform2D
-from official.projects.volumetric_models.data_augmentations.tfda_3d.transforms.noise_transforms import GaussianNoiseTransform, GaussianBlurTransform
-from official.projects.volumetric_models.data_augmentations.tfda_3d.transforms.color_transforms import BrightnessMultiplicativeTransform, ContrastAugmentationTransform, GammaTransform
-from official.projects.volumetric_models.data_augmentations.tfda_3d.transforms.custom_transforms import MaskTransform, OneHotTransform, Convert3DTo2DTransform, Convert2DTo3DTransform
-from official.projects.volumetric_models.data_augmentations.tfda_3d.transforms.utility_transforms import RemoveLabelTransform
-from official.projects.volumetric_models.data_augmentations.tfda_3d.transforms.resample_transforms import SimulateLowResolutionTransform
-from official.projects.volumetric_models.data_augmentations.tfda_3d.defs import TFDAData, TFDADefault3DParams, DTFT, TFbF, TFbT, nan, pi
-from official.projects.volumetric_models.data_augmentations.tfda_3d.data_processing_utils import get_batch_size, update_tf_channel
+from data_augmentations.tfda_3d.transforms.spatial_transforms import SpatialTransform, MirrorTransform, SpatialTransform2D
+from data_augmentations.tfda_3d.transforms.noise_transforms import GaussianNoiseTransform, GaussianBlurTransform
+from data_augmentations.tfda_3d.transforms.color_transforms import BrightnessMultiplicativeTransform, ContrastAugmentationTransform, GammaTransform
+from data_augmentations.tfda_3d.transforms.custom_transforms import MaskTransform, OneHotTransform, Convert3DTo2DTransform, Convert2DTo3DTransform
+from data_augmentations.tfda_3d.transforms.utility_transforms import RemoveLabelTransform
+from data_augmentations.tfda_3d.transforms.resample_transforms import SimulateLowResolutionTransform
+from data_augmentations.tfda_3d.defs import TFDAData, TFDADefault3DParams, DTFT, TFbF, TFbT, nan, pi
+from data_augmentations.tfda_3d.data_processing_utils import get_batch_size, update_tf_channel
 
 
 class Decoder(decoder.Decoder):

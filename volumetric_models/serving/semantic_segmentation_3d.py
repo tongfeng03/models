@@ -19,10 +19,10 @@ from typing import Mapping
 import tensorflow as tf
 
 # pylint: disable=unused-import
-from official.projects.volumetric_models.modeling import backbones
-from official.projects.volumetric_models.modeling import decoders
-from official.projects.volumetric_models.modeling import factory
-from official.projects.volumetric_models.serving import export_base
+from modeling import backbones
+from modeling import decoders
+from modeling import factory
+from serving import export_base
 
 
 class SegmentationModule(export_base.ExportModule):

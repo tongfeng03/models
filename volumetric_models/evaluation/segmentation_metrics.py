@@ -16,7 +16,7 @@
 from typing import Optional, Sequence
 
 import tensorflow as tf
-from official.projects.volumetric_models.losses import segmentation_losses
+from losses import segmentation_losses
 
 
 class DiceScore:

@@ -3,7 +3,7 @@ import tensorflow as tf
 
 # Local
 # tf.debugging.set_log_device_placement(True)
-from official.projects.volumetric_models.data_augmentations.tfda_2d.augmentations.utils import (
+from data_augmentations.tfda_2d.augmentations.utils import (
     create_zero_centered_coordinate_mesh,
     create_zero_centered_coordinate_mesh_2D,
     elastic_deform_coordinates,
@@ -12,15 +12,15 @@ from official.projects.volumetric_models.data_augmentations.tfda_2d.augmentation
     rotate_coords_3d,
     scale_coords,
 )
-from official.projects.volumetric_models.data_augmentations.tfda_2d.data_processing_utils import (
+from data_augmentations.tfda_2d.data_processing_utils import (
     center_crop_fn,
     interpolate_img,
     interpolate_img_2d,
     random_crop_fn,
     update_tf_channel,
 )
-from official.projects.volumetric_models.data_augmentations.tfda_2d.defs import TFbF, TFbT, nan, pi
-from official.projects.volumetric_models.data_augmentations.tfda_2d.utils import isnotnan
+from data_augmentations.tfda_2d.defs import TFbF, TFbT, nan, pi
+from data_augmentations.tfda_2d.utils import isnotnan
 
 
 def augment_spatial_helper(

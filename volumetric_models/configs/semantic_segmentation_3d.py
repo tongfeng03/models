@@ -21,8 +21,8 @@ from official.core import config_definitions as cfg
 from official.core import exp_factory
 from official.modeling import hyperparams
 from official.modeling import optimization
-from official.projects.volumetric_models.configs import backbones
-from official.projects.volumetric_models.configs import decoders
+from configs import backbones
+from configs import decoders
 from official.vision.beta.configs import common
 
 

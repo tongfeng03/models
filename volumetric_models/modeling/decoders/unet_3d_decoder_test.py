@@ -19,8 +19,8 @@
 from absl.testing import parameterized
 import tensorflow as tf
 
-from official.projects.volumetric_models.modeling.backbones import unet_3d
-from official.projects.volumetric_models.modeling.decoders import unet_3d_decoder
+from modeling.backbones import unet_3d
+from modeling.decoders import unet_3d_decoder
 
 
 class UNet3DDecoderTest(parameterized.TestCase, tf.test.TestCase):

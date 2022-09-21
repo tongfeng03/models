@@ -20,9 +20,9 @@ import tensorflow_addons as tfa
 from tensorflow_graphics.math.interpolation import trilinear
 
 # Local
-from official.projects.volumetric_models.data_augmentations.tfda_3d.augmentations.utils import rotate_coords_2d, rotate_coords_3d
-from official.projects.volumetric_models.data_augmentations.tfda_3d.defs import DTFT, TFbF, TFbT, TFDADefault3DParams, nan, pi
-from official.projects.volumetric_models.data_augmentations.tfda_3d.utils import isnan
+from data_augmentations.tfda_3d.augmentations.utils import rotate_coords_2d, rotate_coords_3d
+from data_augmentations.tfda_3d.defs import DTFT, TFbF, TFbT, TFDADefault3DParams, nan, pi
+from data_augmentations.tfda_3d.utils import isnan
 
 
 def get_batch_size(final_patch_size, rot_x, rot_y, rot_z, scale_range):

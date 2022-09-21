@@ -2,8 +2,8 @@
 import tensorflow as tf
 
 # Local
-from official.projects.volumetric_models.data_augmentations.tfda_3d.defs import TFbT, nan
-from official.projects.volumetric_models.data_augmentations.tfda_3d.utils import isnan, isnotnan
+from data_augmentations.tfda_3d.defs import TFbT, nan
+from data_augmentations.tfda_3d.utils import isnan, isnotnan
 
 
 @tf.function

@@ -2,8 +2,8 @@
 import tensorflow as tf
 
 # Local
-from official.projects.volumetric_models.data_augmentations.tfda_2d.base import TFDABase
-from official.projects.volumetric_models.data_augmentations.tfda_2d.defs import TFbT, TFDAData
+from data_augmentations.tfda_2d.base import TFDABase
+from data_augmentations.tfda_2d.defs import TFbT, TFDAData
 
 
 class DataChannelSelectionTransform(TFDABase):

@@ -3,15 +3,15 @@ import tensorflow as tf
 
 # Local
 # tf.debugging.set_log_device_placement(True)
-from official.projects.volumetric_models.data_augmentations.tfda_2d.augmentations.color_augmentations import (
+from data_augmentations.tfda_2d.augmentations.color_augmentations import (
     augment_brightness_additive,
     augment_brightness_multiplicative,
     augment_contrast,
     augment_gamma,
 )
-from official.projects.volumetric_models.data_augmentations.tfda_2d.base import TFDABase
-from official.projects.volumetric_models.data_augmentations.tfda_2d.defs import TFbF, TFDAData
-from official.projects.volumetric_models.data_augmentations.tfda_2d.utils import to_tf_bool, to_tf_float
+from data_augmentations.tfda_2d.base import TFDABase
+from data_augmentations.tfda_2d.defs import TFbF, TFDAData
+from data_augmentations.tfda_2d.utils import to_tf_bool, to_tf_float
 
 
 class ColorTrans(TFDABase):

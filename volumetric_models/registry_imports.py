@@ -16,7 +16,7 @@
 
 # pylint: disable=unused-import
 from official.common import registry_imports
-from official.projects.volumetric_models.configs import semantic_segmentation_3d as semantic_segmentation_3d_cfg
-from official.projects.volumetric_models.modeling import backbones
-from official.projects.volumetric_models.modeling import decoders
-from official.projects.volumetric_models.tasks import semantic_segmentation_3d
+from configs import semantic_segmentation_3d as semantic_segmentation_3d_cfg
+from modeling import backbones
+from modeling import decoders
+from tasks import semantic_segmentation_3d

@@ -26,10 +26,10 @@ import tensorflow as tf
 from official.common import registry_imports  # pylint: disable=unused-import
 from official.core import exp_factory
 from official.modeling import optimization
-from official.projects.volumetric_models.evaluation import segmentation_metrics
-from official.projects.volumetric_models.modeling import backbones
-from official.projects.volumetric_models.modeling import decoders
-from official.projects.volumetric_models.tasks import semantic_segmentation_3d as img_seg_task
+from evaluation import segmentation_metrics
+from modeling import backbones
+from modeling import decoders
+from tasks import semantic_segmentation_3d as img_seg_task
 from official.vision.beta.dataloaders import tfexample_utils
 
 

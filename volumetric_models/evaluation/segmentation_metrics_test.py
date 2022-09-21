@@ -17,7 +17,7 @@
 from absl.testing import parameterized
 import tensorflow as tf
 
-from official.projects.volumetric_models.evaluation import segmentation_metrics
+from evaluation import segmentation_metrics
 
 
 class SegmentationMetricsTest(parameterized.TestCase, tf.test.TestCase):

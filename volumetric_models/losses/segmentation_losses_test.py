@@ -17,7 +17,7 @@
 from absl.testing import parameterized
 import tensorflow as tf
 
-from official.projects.volumetric_models.losses import segmentation_losses
+from losses import segmentation_losses
 
 
 class SegmentationLossDiceScoreTest(parameterized.TestCase, tf.test.TestCase):

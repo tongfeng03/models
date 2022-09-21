@@ -22,10 +22,10 @@ import tensorflow as tf
 
 # pylint: disable=unused-import
 from official.core import exp_factory
-from official.projects.volumetric_models.configs import semantic_segmentation_3d as exp_cfg
-from official.projects.volumetric_models.modeling import backbones
-from official.projects.volumetric_models.modeling import decoders
-from official.projects.volumetric_models.serving import semantic_segmentation_3d
+from configs import semantic_segmentation_3d as exp_cfg
+from modeling import backbones
+from modeling import decoders
+from serving import semantic_segmentation_3d
 
 
 class SemanticSegmentationExportTest(tf.test.TestCase, parameterized.TestCase):

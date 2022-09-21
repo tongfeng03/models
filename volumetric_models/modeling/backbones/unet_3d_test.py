@@ -19,7 +19,7 @@
 from absl.testing import parameterized
 import tensorflow as tf
 
-from official.projects.volumetric_models.modeling.backbones import unet_3d
+from modeling.backbones import unet_3d
 
 
 class UNet3DTest(parameterized.TestCase, tf.test.TestCase):

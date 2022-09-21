@@ -18,10 +18,10 @@ from absl.testing import parameterized
 import tensorflow as tf
 
 # pylint: disable=unused-import
-from official.projects.volumetric_models.configs import semantic_segmentation_3d as exp_cfg
-from official.projects.volumetric_models.modeling import backbones
-from official.projects.volumetric_models.modeling import decoders
-from official.projects.volumetric_models.modeling import factory
+from configs import semantic_segmentation_3d as exp_cfg
+from modeling import backbones
+from modeling import decoders
+from modeling import factory
 
 
 class SegmentationModelBuilderTest(parameterized.TestCase, tf.test.TestCase):

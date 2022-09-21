@@ -19,7 +19,7 @@
 from absl.testing import parameterized
 import tensorflow as tf
 
-from official.projects.volumetric_models.modeling import nn_blocks_3d
+from modeling import nn_blocks_3d
 
 
 class NNBlocks3DTest(parameterized.TestCase, tf.test.TestCase):

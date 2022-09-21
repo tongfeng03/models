@@ -24,8 +24,8 @@ from typing import Any, Dict, Mapping, Optional, Sequence
 import tensorflow as tf
 
 from official.modeling import hyperparams
-from official.projects.volumetric_models.modeling import nn_blocks_3d
-from official.projects.volumetric_models.modeling.decoders import factory
+from modeling import nn_blocks_3d
+from modeling.decoders import factory
 
 layers = tf.keras.layers
 

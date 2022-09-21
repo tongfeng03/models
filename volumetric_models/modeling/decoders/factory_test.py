@@ -18,10 +18,10 @@ from absl.testing import parameterized
 import tensorflow as tf
 
 from tensorflow.python.distribute import combinations
-from official.projects.volumetric_models.configs import decoders as decoders_cfg
-from official.projects.volumetric_models.configs import semantic_segmentation_3d as semantic_segmentation_3d_exp
-from official.projects.volumetric_models.modeling import decoders
-from official.projects.volumetric_models.modeling.decoders import factory
+from configs import decoders as decoders_cfg
+from configs import semantic_segmentation_3d as semantic_segmentation_3d_exp
+from modeling import decoders
+from modeling.decoders import factory
 
 
 class FactoryTest(tf.test.TestCase, parameterized.TestCase):

@@ -19,7 +19,7 @@ from absl.testing import parameterized
 import numpy as np
 import tensorflow as tf
 
-from official.projects.volumetric_models.modeling.heads import segmentation_heads_3d
+from modeling.heads import segmentation_heads_3d
 
 
 class SegmentationHead3DTest(parameterized.TestCase, tf.test.TestCase):

@@ -15,4 +15,4 @@
 # Lint as: python3
 """Backbones package definition."""
 
-from official.projects.volumetric_models.modeling.backbones.unet_3d import UNet3D
+from modeling.backbones.unet_3d import UNet3D

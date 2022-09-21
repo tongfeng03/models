@@ -15,4 +15,4 @@
 # Lint as: python3
 """Decoders package definition."""
 
-from official.projects.volumetric_models.modeling.decoders.unet_3d_decoder import UNet3DDecoder
+from modeling.decoders.unet_3d_decoder import UNet3DDecoder
