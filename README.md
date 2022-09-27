@@ -2,9 +2,13 @@
 This TF nnUNet code is implemented based on TensorFlow volumetric models from TensorFlow Model Garden vision projects. 
 
 ## TensorFlow Model Garden Installation
-Create a virtual environment and install the TensorFlow Model Garden pip package.
+the TensorFlow Model Garden code is installed as a git submodule by:
 ```bash
-pip3 install tf-models-official==2.7.0
+git submodule add https://github.com/tensorflow/models
+```
+The submodule repository is reset for compatibility by:
+```bash
+git reset --hard 49a5706ca438d30fe71d70f79303c9bf84b17af1
 ```
 Note: code was run with Python 3.9.7
 
