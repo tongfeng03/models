@@ -21,7 +21,7 @@ import tensorflow as tf
 from modeling import backbones
 from modeling import decoders
 from modeling.heads import segmentation_heads_3d
-from official.vision.beta.modeling import segmentation_model
+from official.vision.modeling import segmentation_model
 
 
 class SegmentationNetworkUNet3DTest(parameterized.TestCase, tf.test.TestCase):

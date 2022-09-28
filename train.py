@@ -19,7 +19,7 @@ import gin  # pylint: disable=unused-import
 
 from official.common import flags as tfm_flags
 import registry_imports  # pylint: disable=unused-import
-from official.vision.beta import train
+from official.vision import train
 
 def main(_):
   train.main(_)

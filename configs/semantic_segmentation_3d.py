@@ -23,7 +23,7 @@ from official.modeling import hyperparams
 from official.modeling import optimization
 from configs import backbones
 from configs import decoders
-from official.vision.beta.configs import common
+from official.vision.configs import common
 
 
 @dataclasses.dataclass

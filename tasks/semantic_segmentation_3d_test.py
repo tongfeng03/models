@@ -30,7 +30,7 @@ from evaluation import segmentation_metrics
 from modeling import backbones
 from modeling import decoders
 from tasks import semantic_segmentation_3d as img_seg_task
-from official.vision.beta.dataloaders import tfexample_utils
+from official.vision.dataloaders import tfexample_utils
 
 
 class SemanticSegmentationTaskTest(tf.test.TestCase, parameterized.TestCase):
