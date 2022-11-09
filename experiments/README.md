@@ -1,3 +1,8 @@
+# Example
+
+To run experiments: 
+
+```bash
 CUDA_VISIBLE_DEVICES=1 \
 python3 /home/fengtong/tf_nnunet/train.py \
 --experiment=seg_unet3d_test \
@@ -16,3 +21,4 @@ trainer.validation_interval=25000, \
 trainer.steps_per_loop=25000, \
 trainer.summary_interval=25000, \
 trainer.train_steps=250"
+```
