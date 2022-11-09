@@ -1,5 +1,6 @@
 import os
 import pickle
+import argparse
 
 import numpy as np
 import tensorflow as tf
@@ -46,9 +47,18 @@ def main(splits_file, fold, data_path, save_path):
 
 
 if __name__ == '__main__':
-    nnUNet_preprocessed = "/mnt/SSD1/fengtong/nnunet/nnUNet_preprocessed"
-    task_id = 4
-    network_architecture = '3d'  # 2d, 3d
+    parser = argparse.ArgumentParser(description='Configurations for data format conversion.')
+    parser.add_argument('--data_path', type=str, default='/mnt/SSD1/fengtong/nnunet/nnUNet_preprocessed', 
+                        help='nnUNet preprocessed data.')
+    parser.add_argument('--task', type=int, default=4, 
+                        help='Task id.')
+    parser.add_argument('--network', type=str, choices=['2d','3d'], default='3d',
+                        help='Network architecture.')
+    args = parser.parse_args()
+
+    nnUNet_preprocessed = args.data_path
+    task_id = args.task
+    network_architecture = args.network
 
     task_name = {
         1: "Task001_BrainTumour",
