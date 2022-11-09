@@ -84,9 +84,9 @@ The results by 5-fold cross-validation of our TF nnUNet implementation are as fo
 `serving/export_saved_model.py` exports a trained checkpoint so the model can be used in inference later. Following lines show the parameters of the command:
 
 ```bash
-python3 /…/models/official/projects/volumetric_models/serving/export_saved_model.py \
+python3 serving/export_saved_model.py \
 --experiment=seg_unet3d_test \
---export_dir=/…/exported_model \
+--export_dir=$OUTPUT_PATH/exported_model \
 --checkpoint_path==SAVED_CKPT_PATH \
 --config_file=YAML_FILE_PATH \
 --batch_size=1 \
